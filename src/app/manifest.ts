@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Quillbyte",
     short_name: "Quillbyte",
     description:
-      "Modern Blogging Platform for Programming, AI and Software Engineering",
+      "A modern publication for practical engineering, product, and technology writing.",
 
     start_url: "/",
 

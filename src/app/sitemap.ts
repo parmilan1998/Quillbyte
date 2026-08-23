@@ -7,7 +7,8 @@ import { prisma } from "@/lib/auth";
 // included (never drafts/scheduled/archived), matching the original
 // prompt's own instruction to never include private/draft content here.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://quillbyte.dev";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://quilbyte.vercel.app";
 
   let posts: { slug: string; updatedAt: Date }[] = [];
   let categories: { slug: string; updatedAt: Date }[] = [];

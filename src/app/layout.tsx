@@ -15,23 +15,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://quillbyte.dev";
+const siteUrl =
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://quilbyte.vercel.app";
+const siteName = "Quillbyte";
+const siteDescription =
+  "A modern publication for practical engineering, product, and technology writing.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
 
   title: {
-    default: "Quillbyte | Ideas worth shipping",
-    template: "%s | Quillbyte",
+    default: `${siteName} | Ideas worth shipping`,
+    template: `%s | ${siteName}`,
   },
 
-  description:
-    "Quillbyte is a modern publication for thoughtful engineering, product, and technology writing.",
+  description: siteDescription,
 
-  applicationName: "Quillbyte",
+  applicationName: siteName,
 
   keywords: [
-    "Quillbyte",
+    siteName,
     "Blog",
     "Programming",
     "Software Engineering",
@@ -53,14 +56,14 @@ export const metadata: Metadata = {
 
   authors: [
     {
-      name: "Quillbyte Team",
+      name: `${siteName} Team`,
       url: siteUrl,
     },
   ],
 
-  creator: "Quillbyte",
+  creator: siteName,
 
-  publisher: "Quillbyte",
+  publisher: siteName,
 
   category: "Technology",
 
@@ -82,13 +85,12 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title: "Quillbyte | Ideas worth shipping",
-    description:
-      "Explore high-quality articles about programming, AI, software engineering, and modern web development.",
+    title: `${siteName} | Ideas worth shipping`,
+    description: siteDescription,
 
     url: siteUrl,
 
-    siteName: "Quillbyte",
+    siteName,
 
     locale: "en_US",
 
@@ -96,21 +98,22 @@ export const metadata: Metadata = {
 
     images: [
       {
-        url: "/icon.svg",
+        url: "/social-card.svg",
         width: 1200,
         height: 630,
-        alt: "Quillbyte publication",
+        alt: "Quillbyte - Ideas worth shipping",
       },
     ],
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "Quillbyte",
-    description:
-      "Modern programming tutorials, AI articles, and software engineering blogs.",
+    title: siteName,
+    description: siteDescription,
+    creator: "@quillbyte",
+    site: "@quillbyte",
 
-    images: ["/icon.svg"],
+    images: ["/social-card.svg"],
   },
 
   icons: {
@@ -119,6 +122,40 @@ export const metadata: Metadata = {
   },
 
   manifest: "/site.webmanifest",
+  other: {
+    "geo.region": "US",
+    "geo.placename": "Remote-first publication",
+    "content-language": "en-US",
+  },
+};
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: siteName,
+      url: siteUrl,
+      logo: `${siteUrl}/icon.svg`,
+      description: siteDescription,
+      sameAs: ["https://twitter.com/quillbyte", "https://github.com/quillbyte"],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${siteUrl}/#website`,
+      name: siteName,
+      url: siteUrl,
+      description: siteDescription,
+      publisher: { "@id": `${siteUrl}/#organization` },
+      inLanguage: "en-US",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${siteUrl}/search?q={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -139,6 +176,10 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <TopProgressBar />
         </Suspense>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <AppProviders>{children}</AppProviders>
       </body>
     </html>
