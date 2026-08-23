@@ -52,6 +52,8 @@ const LoginForm = ({ setIsNavigating }: ILoginForm) => {
   });
 
   const onSubmit = async (data: FormData) => {
+    setIsNavigating(true);
+
     try {
       const { data: session, error } = await authClient.signIn.email({
         email: data.email,
@@ -60,11 +62,10 @@ const LoginForm = ({ setIsNavigating }: ILoginForm) => {
       });
 
       if (error) {
+        setIsNavigating(false);
         toast.error(error.message || "Invalid email or password");
         return;
       }
-
-      setIsNavigating(true);
 
       const role = session?.user?.role;
 

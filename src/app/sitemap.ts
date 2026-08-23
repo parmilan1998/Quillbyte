@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 // Reads real data — Post/Category/Tag all predate the unverified schema
 // rounds in AUDIT.md, so this doesn't carry the same "unrun migration"
 // risk as everything added since. Only published, non-deleted posts are

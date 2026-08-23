@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Zap } from "lucide-react";
+import Image from "next/image";
+import { SITE } from "@/constants";
 
 export function startPageLoading() {
   if (typeof window !== "undefined") {
@@ -104,22 +106,25 @@ export function TopProgressBar() {
 // ─── Full-Screen Page Loader ──────────────────────────────────────────────────
 export function PageLoader({ message = "Loading…" }: { message?: string }) {
   return (
-    <div className="fixed inset-0 z-9998 flex flex-col items-center justify-center bg-background">
-      {/* Glowing logo mark */}
-      <div className="relative mb-8">
-        <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-          <Zap className="w-8 h-8 text-primary animate-pulse" />
+    <div className="fixed inset-0 z-9998 flex flex-col items-center justify-center bg-background/98 px-6">
+      <div className="relative mb-7">
+        <div className="w-20 h-20 rounded-3xl bg-card border border-border shadow-xl shadow-primary/10 flex items-center justify-center">
+          <Image
+            src={SITE.logo}
+            alt={`${SITE.name} logo`}
+            width={52}
+            height={52}
+            priority
+          />
         </div>
-        {/* Ping ring */}
-        <span className="absolute inset-0 rounded-2xl border border-primary/40 animate-ping" />
+        <span className="absolute -inset-2 rounded-4xl border border-primary/20 animate-pulse" />
       </div>
 
-      {/* Animated dots */}
-      <div className="flex gap-1.5 mb-5">
+      <div className="flex items-center gap-2 mb-4">
         {[0, 1, 2].map((i) => (
           <span
             key={i}
-            className="w-2 h-2 rounded-full bg-primary"
+            className="w-2.5 h-2.5 rounded-full bg-primary"
             style={{
               animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
             }}
@@ -130,6 +135,7 @@ export function PageLoader({ message = "Loading…" }: { message?: string }) {
       <p className="text-sm text-muted-foreground font-medium tracking-wide">
         {message}
       </p>
+      <p className="mt-2 text-xs text-muted-foreground/60">{SITE.name}</p>
 
       <style>{`
         @keyframes bounce {

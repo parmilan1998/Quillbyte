@@ -3,6 +3,7 @@
 import { authClient } from "@/lib/client";
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { PageLoader, startPageLoading } from "@/components/ui/page-loader";
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -14,16 +15,13 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 
   useEffect(() => {
     if (!isPending && session) {
+      startPageLoading();
       router.replace("/dashboard");
     }
   }, [session, isPending, router]);
 
   if (isPending) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        Loading...
-      </div>
-    );
+    return <PageLoader message="Preparing your workspace" />;
   }
 
   if (session) {
