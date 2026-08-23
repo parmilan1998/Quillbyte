@@ -457,6 +457,237 @@ Architecting for resilience ensures your application stays operational during un
     tags: ["system-design", "cloud", "devops", "aws"],
     featured: true,
   },
+  {
+    title: "The Quiet Power of a Well-Designed API",
+    slug: "quiet-power-of-a-well-designed-api",
+    excerpt:
+      "The best APIs disappear into the product. They make the right thing easy, failures understandable, and change less frightening.",
+    content: `## Good APIs Reduce Cognitive Load
+
+An API is not just a collection of endpoints. It is a promise about how another developer can work with your system. The promise becomes valuable when it is predictable enough that people stop thinking about the interface and start solving their actual problem.
+
+### Start with the Common Path
+
+Design the happy path before adding every possible filter and option. A small endpoint that handles the most frequent operation clearly is more useful than a flexible endpoint nobody understands.
+
+### Errors Are Part of the Interface
+
+A useful error answers three questions: what happened, why it happened, and what the caller can do next. Stable error codes are often more valuable than clever prose because clients can respond to them without parsing sentences.
+
+
+
+### Design for Change
+
+Names, pagination, idempotency, and versioning are decisions about the future. Make them explicit early, document the trade-offs, and resist adding an abstraction until a real consumer needs it.
+
+The quiet power of a good API is that it gives every team member a smaller mental model to carry. That is how interfaces scale: not by exposing more capability, but by making the important capability obvious.`,
+    featuredImageUrl:
+      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1600&q=85",
+    category: "technology",
+    authorEmail: "admin@example.com",
+    tags: ["api", "rest-api", "design"],
+  },
+  {
+    title: "Why Your Side Project Needs a Smaller Scope",
+    slug: "why-your-side-project-needs-a-smaller-scope",
+    excerpt:
+      "Most personal projects do not fail from a lack of ambition. They fail because the first version asks to become a company before it becomes useful.",
+    content: `## The First Version Is a Question
+
+A side project is an experiment with a user-shaped question at its center. Can this workflow be made easier? Will people return to this tool? Does this idea solve a problem outside my own head?
+
+When the first version includes billing, social graphs, notifications, teams, and a mobile app, the question gets buried beneath infrastructure.
+
+### Choose One Complete Loop
+
+The best first milestone is not a feature list. It is one complete loop:
+
+1. Someone arrives with a real problem.
+2. Your product helps them make progress.
+3. They leave with a result worth remembering.
+
+Everything that does not support that loop can wait.
+
+### Constraints Create Momentum
+
+Set a small number of constraints: one platform, one audience, one core action, and one way to measure whether the action helped. Constraints turn vague excitement into a buildable shape.
+
+The goal is not to make the smallest product forever. The goal is to learn what deserves to become bigger.`,
+    featuredImageUrl:
+      "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1600&q=85",
+    category: "productivity",
+    authorEmail: "admin@example.com",
+    tags: ["ui-ux", "design", "web-performance"],
+  },
+  {
+    title: "A Practical Mental Model for React Performance",
+    slug: "practical-mental-model-for-react-performance",
+    excerpt:
+      "React performance becomes easier to reason about when you stop chasing renders and start measuring work on the critical path.",
+    content: `## Performance Is a User Experience
+
+Users do not experience a component tree. They experience waiting, movement, and feedback. A technically correct application can still feel slow when expensive work happens before the interface acknowledges an action.
+
+### Find the Critical Interaction
+
+Start with the interaction that matters most: opening a workspace, searching a catalog, submitting a form, or reading the first article. Measure it before changing code.
+
+### Reduce Work Before Memoizing It
+
+The highest-leverage improvements usually come from rendering less data, moving fetching closer to the server, and splitting heavy client features from the initial route. Memoization is useful, but it should be a response to measured repeated work rather than a ritual.
+
+### Make Loading Feel Intentional
+
+Skeletons, optimistic updates, and progress indicators are not decoration. They communicate that the system received the user's action. Good feedback makes a short wait feel shorter and a long wait feel honest.
+
+Performance work is product work. The best result is not a lower number in a profiler. It is a person who can complete an important task without wondering whether the application heard them.`,
+    featuredImageUrl:
+      "https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=1600&q=85",
+    category: "programming",
+    authorEmail: "admin@example.com",
+    tags: ["react", "nextjs", "web-performance", "typescript"],
+  },
+  {
+    title: "The Database Migration Habit That Saves Weekends",
+    slug: "database-migration-habit-that-saves-weekends",
+    excerpt:
+      "Safe migrations are less about perfect scripts and more about making schema changes observable, reversible, and boring.",
+    content: `## Treat Schema Changes as Product Changes
+
+A database is shared state. Changing it affects deploys, background jobs, reports, and every version of the application that may still be running. That makes migrations a coordination problem, not just a SQL problem.
+
+### Expand, Migrate, Contract
+
+For a risky change, add the new structure first, write both old and new representations during the transition, backfill deliberately, and remove the old path only after the new one is proven.
+
+### Make Backfills Interruptible
+
+Large updates should run in small batches with progress you can observe. A process that can stop and resume is more valuable than a clever one-shot script that leaves the team guessing after a timeout.
+
+### Verify Before You Deploy
+
+Test the migration against realistic data volume. Check indexes, lock behavior, rollback options, and the application version that will run while the migration is in progress.
+
+The best migration is the one nobody remembers six months later. Reliability is often the result of turning dramatic operational moments into a sequence of ordinary, reviewable steps.`,
+    featuredImageUrl:
+      "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1600&q=85",
+    category: "cloud-devops",
+    authorEmail: "admin@example.com",
+    tags: ["postgresql", "prisma", "devops", "system-design"],
+  },
+  {
+    title: "What AI Coding Tools Still Cannot Do for You",
+    slug: "what-ai-coding-tools-still-cannot-do",
+    excerpt:
+      "AI can accelerate implementation, but judgment about boundaries, trade-offs, and responsibility remains an engineering skill.",
+    content: `## Speed Is Not the Same as Direction
+
+AI coding tools are excellent at producing plausible code quickly. That changes the cost of typing, but it does not remove the need to decide what should exist, who it serves, or what can go wrong.
+
+### Context Is Still Your Job
+
+The model does not own your domain constraints, incident history, privacy requirements, or team's tolerance for maintenance. Supplying useful context and checking the result are part of the work, not overhead around it.
+
+### Review the Edges
+
+Generated code often handles the central example well. Spend review time on permissions, retries, malformed input, partial failure, data deletion, and observability. These are the places where a confident-looking shortcut becomes an expensive incident.
+
+### Keep the Human Decision Visible
+
+A good team can explain why a generated change exists and what evidence supports it. The goal is not to hide AI involvement. It is to make the resulting system understandable to the people responsible for operating it.
+
+AI makes implementation cheaper. Engineering judgment is still how teams decide what is worth building and how safely it can live in the world.`,
+    featuredImageUrl:
+      "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1600&q=85",
+    category: "ai-ml",
+    authorEmail: "admin@example.com",
+    tags: ["ai", "machine-learning", "security", "productivity"],
+    trending: true,
+  },
+  {
+    title: "Design Systems Are Agreements, Not Libraries",
+    slug: "design-systems-are-agreements-not-libraries",
+    excerpt:
+      "A component library is useful, but a design system becomes durable when teams agree on the decisions behind the components.",
+    content: `## The Code Is the Visible Part
+
+Buttons, inputs, and layout primitives are the artifacts of a design system. The system itself is the shared language that explains when those artifacts should be used and what quality they promise.
+
+### Document Decisions, Not Just Options
+
+Teams do not need a menu of every possible color and spacing value. They need clear answers: which action is primary, how error states behave, and how much content a surface can hold before it becomes difficult to scan.
+
+### Accessibility Is a System Property
+
+Keyboard behavior, focus states, contrast, reduced motion, and semantic structure should be built into the agreement. Asking every feature team to rediscover them creates inconsistent experiences and slow reviews.
+
+### Let the System Have Edges
+
+Not every screen needs to look identical. A healthy system creates consistency where it helps people navigate, while leaving room for content and context to shape the final composition.
+
+The strongest design systems do not make creativity impossible. They make the routine decisions quiet enough that teams can spend their attention on the decisions that matter.`,
+    featuredImageUrl:
+      "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=1600&q=85",
+    category: "design",
+    authorEmail: "admin@example.com",
+    tags: ["design", "ui-ux", "css", "tailwind"],
+  },
+  {
+    title: "The Case for Boring Observability",
+    slug: "case-for-boring-observability",
+    excerpt:
+      "Reliable observability is not a wall of dashboards. It is a small set of signals that helps a tired engineer answer the next question.",
+    content: `## Start with the Questions
+
+When a service is unhealthy, people ask predictable questions. Is it available? Is it slow? Who is affected? What changed? Good observability makes those questions cheap to answer.
+
+### Prefer Signals with Owners
+
+Every important metric should have someone who understands what normal looks like and what action follows an alert. An alert without an owner is just a louder dashboard.
+
+### Logs Need a Story
+
+Structured logs become useful when they connect a request across boundaries. Include stable identifiers, meaningful event names, and enough context to distinguish a user-visible failure from an expected retry.
+
+### Measure Outcomes, Not Activity
+
+CPU usage and queue depth matter, but they are not the product. Pair infrastructure signals with outcomes such as successful checkouts, completed jobs, or time to first useful response.
+
+Observability should feel boring on healthy days and immediately useful on difficult ones. That is not a lack of ambition. It is a sign that the system respects the engineer who has to debug it at 2 a.m.`,
+    featuredImageUrl:
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1600&q=85",
+    category: "cloud-devops",
+    authorEmail: "admin@example.com",
+    tags: ["devops", "cloud", "system-design", "security"],
+  },
+  {
+    title: "How to Write Technical Tutorials People Finish",
+    slug: "how-to-write-technical-tutorials-people-finish",
+    excerpt:
+      "The best tutorials respect the reader's attention: they establish a destination, remove unnecessary choices, and explain the moments that usually break.",
+    content: `## Teach the Path, Not the Inventory
+
+A tutorial is a guided experience. Readers need to know where they are going, what they should see next, and why each step exists. Listing every feature of a tool is documentation; helping someone complete a useful task is teaching.
+
+### Give the Reader a Working Checkpoint
+
+Frequent checkpoints build trust. After each meaningful step, show the expected result and explain what to inspect if it does not appear. Readers should never have to guess whether they are still on track.
+
+### Explain the Sharp Edges
+
+The most valuable sentences often describe what the happy path hides: a required environment variable, a version mismatch, a slow first install, or a security choice that should not be skipped.
+
+### End with a Next Step
+
+Once the reader has a working result, suggest one small extension that reinforces the concept. A good next step turns a tutorial from a one-time copy exercise into the beginning of understanding.
+
+Technical writing succeeds when the reader reaches the end with more agency than they had at the start. Clarity is not simplification for its own sake. It is respect for the person doing the work.`,
+    featuredImageUrl:
+      "https://images.unsplash.com/photo-1456324504439-367cee3b3c32?auto=format&fit=crop&w=1600&q=85",
+    category: "productivity",
+    authorEmail: "admin@example.com",
+    tags: ["javascript", "typescript", "design", "ui-ux"],
+  },
 ];
 
 export async function runPostSeed() {
