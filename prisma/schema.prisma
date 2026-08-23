@@ -1,0 +1,561 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum CategoryStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+  ARCHIVED
+}
+
+enum CommentStatus {
+  VISIBLE
+  PENDING
+  HIDDEN
+  REMOVED
+}
+
+enum NotificationType {
+  FOLLOW
+  POST_LIKE
+  POST_COMMENT
+  COMMENT_REPLY
+  COMMENT_LIKE
+}
+
+// ─── User ────────────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  role          Role      @default(USER)
+  status        UserStatus @default(ACTIVE)
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  posts         Post[]
+
+  postLikes             PostLike[]
+  bookmarks             Bookmark[]
+  comments              Comment[]
+  commentLikes          CommentLike[]
+  following             Follow[]       @relation("Following")
+  followers             Follow[]       @relation("Followers")
+  notificationsReceived Notification[] @relation("NotificationsReceived")
+  notificationsSent     Notification[] @relation("NotificationsSent")
+  readingHistory        ReadingHistory[]
+  media                 Media[]
+  activityLogs          ActivityLog[]
+  aiGenerationUsages    AIGenerationUsage[]
+  reportsFiled          Report[] @relation("ReportsFiled")
+  reportsReviewed       Report[] @relation("ReportsReviewed")
+
+  @@unique([email])
+  @@map("user")
+}
+
+model AIGenerationUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  month     String
+  count     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month])
+  @@index([userId])
+  @@map("ai_generation_usage")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  issuer                String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ─── Category ────────────────────────────────────────────────────────────────
+
+model Category {
+  id          String @id @default(cuid())
+  name        String
+  slug        String @unique
+  description String?
+  color       String @default("#6366f1")
+
+  metaTitle       String?
+  metaDescription String?
+
+  imageUrl String?
+  icon     String?
+
+  status CategoryStatus @default(ACTIVE)
+  order  Int            @default(0)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  posts Post[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([isDeleted])
+  @@map("category")
+}
+
+// ─── Tag ─────────────────────────────────────────────────────────────────────
+
+model Tag {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  description String?
+  color       String  @default("#8b5cf6")
+
+  isDeleted Boolean @default(false)
+
+  posts PostTag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isDeleted])
+  @@map("tag")
+}
+
+// ─── Post ─────────────────────────────────────────────────────────────────────
+
+model Post {
+  id      String @id @default(cuid())
+  title   String
+  slug    String @unique
+  excerpt String?
+  content String @db.Text
+
+  featuredImageUrl String?
+  featuredImageId  String?
+
+  status      PostStatus @default(DRAFT)
+  isFeatured  Boolean    @default(false)
+  isTrending  Boolean    @default(false)
+
+  readingTime Int @default(0)
+  viewCount   Int @default(0)
+
+  publishedAt DateTime?
+  scheduledAt DateTime?
+
+  seoTitle       String?
+  seoDescription String?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  tags PostTag[]
+
+  likes     PostLike[]
+  bookmarks Bookmark[]
+  comments  Comment[]
+  readingHistory ReadingHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([isDeleted])
+  @@map("post")
+}
+
+// ─── PostTag (join) ───────────────────────────────────────────────────────────
+
+model PostTag {
+  postId String
+  tagId  String
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@map("post_tag")
+}
+
+// ─── PostLike ─────────────────────────────────────────────────────────────────
+
+model PostLike {
+  id     String @id @default(cuid())
+  postId String
+  userId String
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+  @@map("post_like")
+}
+
+// ─── Bookmark ─────────────────────────────────────────────────────────────────
+
+model Bookmark {
+  id     String @id @default(cuid())
+  postId String
+  userId String
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+  @@map("bookmark")
+}
+
+// ─── Comment ──────────────────────────────────────────────────────────────────
+
+model Comment {
+  id      String @id @default(cuid())
+  content String @db.Text
+
+  status CommentStatus @default(VISIBLE)
+
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  parentId String?
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  Comment[] @relation("CommentReplies")
+
+  likes CommentLike[]
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId])
+  @@index([userId])
+  @@index([parentId])
+  @@map("comment")
+}
+
+// ─── CommentLike ──────────────────────────────────────────────────────────────
+
+model CommentLike {
+  id        String @id @default(cuid())
+  commentId String
+  userId    String
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([commentId, userId])
+  @@index([commentId])
+  @@index([userId])
+  @@map("comment_like")
+}
+
+// ─── Follow ───────────────────────────────────────────────────────────────────
+
+model Follow {
+  id          String @id @default(cuid())
+  followerId  String
+  followingId String
+
+  follower  User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  @@map("follow")
+}
+
+// ─── ReadingHistory ─────────────────────────────────────────────────────────
+
+model ReadingHistory {
+  id     String @id @default(cuid())
+  userId String
+  postId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  // 0-100, self-reported by the client (scroll position) rather than
+  // measured server-side — best-effort, not a precise reading tracker.
+  progress Int @default(0)
+
+  createdAt    DateTime @default(now())
+  lastViewedAt DateTime @default(now()) @updatedAt
+
+  @@unique([userId, postId])
+  @@index([userId])
+  @@map("reading_history")
+}
+
+// ─── Report ─────────────────────────────────────────────────────────────────
+// Reports a post, comment, or user. Deliberately generic (targetType +
+// targetId) rather than three separate models — the moderation workflow
+// (reason, status, who reviewed it) is identical regardless of what's
+// being reported, and a shared queue is what the admin UI actually needs.
+
+enum ReportTargetType {
+  POST
+  COMMENT
+  USER
+}
+
+enum ReportReason {
+  SPAM
+  HARASSMENT
+  MISINFORMATION
+  COPYRIGHT
+  INAPPROPRIATE
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  DISMISSED
+}
+
+model Report {
+  id String @id @default(cuid())
+
+  targetType ReportTargetType
+  targetId   String
+
+  reason  ReportReason
+  details String?
+  status  ReportStatus @default(PENDING)
+
+  reporterId String
+  reporter   User   @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  reviewedById String?
+  reviewedBy   User?   @relation("ReportsReviewed", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt   DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@index([targetType, targetId])
+  @@map("report")
+}
+// Deliberately covers admin-relevant moderation/account events only (post
+// published/deleted, category created/deleted, comment moderated, user
+// role/status changed) — not every click, and not sign-in/sign-out, which
+// would need a better-auth hook rather than an app-level call site. No
+// IP/user-agent capture either, to avoid logging more than the admin
+// activity feed actually needs (see AUDIT.md / the original prompt's own
+// note: "Do not unnecessarily log private sensitive content").
+
+// ─── ActivityLog ────────────────────────────────────────────────────────────
+
+model ActivityLog {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  action     String
+  resource   String
+  resourceId String?
+  details    String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("activity_log")
+}
+
+// ─── Media ──────────────────────────────────────────────────────────────────
+// One row per successful upload through /api/upload (Cloudinary). Every
+// signed-in caller who can upload (see requireRole() default there) adds
+// to this shared library — it's not scoped to "my uploads only", matching
+// how the admin media library is meant to browse everything ever
+// uploaded, not just the admin's own files.
+
+model Media {
+  id       String @id @default(cuid())
+  url      String
+  publicId String @unique
+
+  name     String
+  mimeType String
+  size     Int
+  width    Int?
+  height   Int?
+
+  folderId String?
+  folder   MediaFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
+  uploadedById String
+  uploadedBy   User   @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([uploadedById])
+  @@index([folderId])
+  @@map("media")
+}
+
+// Flat folders (no nesting) — kept intentionally simple; the media
+// library doesn't need a full folder tree to be useful.
+model MediaFolder {
+  id        String   @id @default(cuid())
+  name      String
+  media     Media[]
+  createdAt DateTime @default(now())
+
+  @@map("media_folder")
+}
+
+// ─── NewsletterSubscriber ───────────────────────────────────────────────────
+// Deliberately just the subscriber list — no Campaign/EmailTemplate model.
+// Sending real email needs a configured provider (Resend/SMTP/etc, none of
+// which exist in this project's env vars — see AUDIT.md), so building
+// campaign-sending here would just be a second layer of fake functionality
+// on top of a real subscriber list. The admin newsletter page's Campaigns
+// and Templates tabs stay mock until a provider is actually wired up.
+
+enum SubscriberStatus {
+  SUBSCRIBED
+  UNSUBSCRIBED
+}
+
+model NewsletterSubscriber {
+  id     String            @id @default(cuid())
+  email  String            @unique
+  status SubscriberStatus  @default(SUBSCRIBED)
+
+  subscribedAt   DateTime  @default(now())
+  unsubscribedAt DateTime?
+
+  @@index([status])
+  @@map("newsletter_subscriber")
+}
+
+// ─── Notification ─────────────────────────────────────────────────────────────
+
+model Notification {
+  id String @id @default(cuid())
+
+  recipientId String
+  recipient   User   @relation("NotificationsReceived", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  actorId String?
+  actor   User?   @relation("NotificationsSent", fields: [actorId], references: [id], onDelete: SetNull)
+
+  type       NotificationType
+  entityId   String?
+  entityType String?
+  message    String
+
+  read Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([recipientId])
+  @@index([recipientId, read])
+  @@map("notification")
+}
