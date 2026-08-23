@@ -6,6 +6,16 @@ import { nextCookies } from "better-auth/next-js";
 import { logActivity } from "./activity-log";
 import { sendVerificationEmail, sendPasswordResetEmail } from "./email";
 
+const trustedOrigins = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "https://quilbyte.vercel.app",
+  process.env.BETTER_AUTH_URL,
+  process.env.NEXT_PUBLIC_APP_URL,
+]
+  .filter((origin): origin is string => Boolean(origin))
+  .map((origin) => origin.replace(/\/$/, ""));
+
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
 });
@@ -13,6 +23,7 @@ const adapter = new PrismaPg({
 export const prisma = new PrismaClient({ adapter });
 
 export const auth = betterAuth({
+  trustedOrigins,
   database: prismaAdapter(prisma, { provider: "postgresql" }),
   emailAndPassword: {
     enabled: true,
