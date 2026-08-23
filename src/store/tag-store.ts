@@ -3,17 +3,21 @@ import type { Tag as TagType } from "@/types";
 import { toast } from "sonner";
 import { TagService } from "@/services/client/tag-service";
 
+export type DBTag = TagType;
+
+export interface CreateTagInput {
+  name: string;
+  slug: string;
+  color: string;
+  description: string;
+}
+
 interface TagState {
   tags: TagType[];
   loading: boolean;
   search: string;
   fetchTags: (search?: string) => Promise<void>;
-  createTag: (data: {
-    name: string;
-    slug: string;
-    color: string;
-    description: string;
-  }) => Promise<void>;
+  createTag: (data: CreateTagInput) => Promise<void>;
   updateTag: (id: string, data: Partial<TagType>) => Promise<void>;
   deleteTag: (id: string) => Promise<void>;
   setSearch: (value: string) => void;
