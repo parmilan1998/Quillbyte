@@ -80,6 +80,10 @@ bookmarks, comments, notifications, search, media management, and analytics.
 
 Open [http://localhost:3000](http://localhost:3000).
 
+For Vercel deployments, the `vercel-build` script automatically runs
+`prisma migrate deploy` before `next build`. Add the same `DATABASE_URL` used
+by the application to the Vercel project environment variables.
+
 ## Environment Variables
 
 At minimum, configure:

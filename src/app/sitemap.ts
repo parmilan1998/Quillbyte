@@ -9,21 +9,29 @@ import { prisma } from "@/lib/auth";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://quillbyte.dev";
 
-  const [posts, categories, tags] = await Promise.all([
-    prisma.post.findMany({
-      where: { status: "PUBLISHED", isDeleted: false },
-      select: { slug: true, updatedAt: true },
-      orderBy: { updatedAt: "desc" },
-    }),
-    prisma.category.findMany({
-      where: { isDeleted: false },
-      select: { slug: true, updatedAt: true },
-    }),
-    prisma.tag.findMany({
-      where: { isDeleted: false },
-      select: { slug: true },
-    }),
-  ]);
+  let posts: { slug: string; updatedAt: Date }[] = [];
+  let categories: { slug: string; updatedAt: Date }[] = [];
+  let tags: { slug: string }[] = [];
+
+  try {
+    [posts, categories, tags] = await Promise.all([
+      prisma.post.findMany({
+        where: { status: "PUBLISHED", isDeleted: false },
+        select: { slug: true, updatedAt: true },
+        orderBy: { updatedAt: "desc" },
+      }),
+      prisma.category.findMany({
+        where: { isDeleted: false },
+        select: { slug: true, updatedAt: true },
+      }),
+      prisma.tag.findMany({
+        where: { isDeleted: false },
+        select: { slug: true },
+      }),
+    ]);
+  } catch (error) {
+    console.error("Unable to load dynamic sitemap entries:", error);
+  }
 
   return [
     {
